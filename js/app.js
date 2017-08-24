@@ -375,7 +375,6 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
             var dueDate = new Date(tasks(i).DueDate);
             if (moment(dueDate).isValid && moment(dueDate).year() != 4501) { mailBody += " [Due: " + moment(dueDate).format("DD-MMM") + "]"; }
             if (taskExcerpt(tasks(i).Body, 10000)) { mailBody += "<br>" + "<font color=gray>" + taskExcerpt(tasks(i).Body, 10000) + "</font>"; }
-//            mailBody += "<br>" + taskStatus(tasks(i).Status) + "";
             mailBody += "</li>";
         }
         mailBody += "</ul>";
@@ -395,7 +394,6 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
             var dueDate = new Date(tasks(i).DueDate);
             if (moment(dueDate).isValid && moment(dueDate).year() != 4501) { mailBody += " [Due: " + moment(dueDate).format("DD-MMM") + "]"; }
             if (taskExcerpt(tasks(i).Body, 10000)) { mailBody += "<br>" + "<font color=gray>" + taskExcerpt(tasks(i).Body, 10000) + "</font>"; }
-//            mailBody += "<br>" + taskStatus(tasks(i).Status) + "";
             mailBody += "</li>";
         }
         mailBody += "</ul>";
@@ -416,7 +414,6 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
             var dueDate = new Date(tasks(i).DueDate);
             if (moment(dueDate).isValid && moment(dueDate).year() != 4501) { mailBody += " [Due: " + moment(dueDate).format("DD-MMM") + "]"; }
             if (taskExcerpt(tasks(i).Body, 10000)) { mailBody += "<br>" + "<font color=gray>" + taskExcerpt(tasks(i).Body, 10000) + "</font>"; }
-//            mailBody += "<br>" + taskStatus(tasks(i).Status) + "";
             mailBody += "</li>";
         }
         mailBody += "</ul>";
@@ -436,7 +433,6 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
             var dueDate = new Date(tasks(i).DueDate);
             if (moment(dueDate).isValid && moment(dueDate).year() != 4501) { mailBody += " [Due: " + moment(dueDate).format("DD-MMM") + "]"; }
             if (taskExcerpt(tasks(i).Body, 10000)) { mailBody += "<br>" + "<font color=gray>" + taskExcerpt(tasks(i).Body, 10000) + "</font>"; }
-//            mailBody += "<br>" + taskStatus(tasks(i).Status) + "";
             mailBody += "</li>";
         }
         mailBody += "</ul>";
