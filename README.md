@@ -25,7 +25,7 @@ My changes:
 13. Optional saving of filter state via CONFIG file
 14. Optional use of privacy filter via CONFIG file
 15. Added configuration for what to do with completed tasks (Nothing, Archive, Hide, Delete)
-16. Added "Filter on start date" configuration option to Backlog folder/column
+16. Added "Filter on start date" configuration option to Backlog folder/column to hide tasks with start date in the future
 17. Added configuration options to show/hide 'Owner' and '% complete' per column
 18. Addded configuration option to enable/disable auto refresh of the taskboard
 
