@@ -17,26 +17,26 @@ var config_data = {
         'OWNER': false,
         'PERCENT': false,
       },
-      'FILTER_ON_START_DATE': true,
+      'FILTER_ON_START_DATE': false,
     },
     'NEXT_FOLDER': {
-      Name: '', Title: 'NEXT', Limit: 10, Sort: "duedate,-priority", Restrict: "",
+      Name: '', Title: 'NEXT', Limit: 0, Sort: "duedate,-priority", Restrict: "[status] = 0 AND ([startdate] <> '' OR [duedate] <> '') ",
       'SHOW': {
         'OWNER': false,
         'PERCENT': false,
       },
     },
     'INPROGRESS_FOLDER': {
-      Name: '', Title: 'IN PROGRESS', Limit: 5, Sort: "-priority", Restrict: "",
+      Name: '', Title: 'IN PROGRESS', Limit: 0, Sort: "-priority", Restrict: "",
       'SHOW': {
-        'OWNER': true,
+        'OWNER': false,
         'PERCENT': true,
       },
     },
     'WAITING_FOLDER': {
       Name: '', Title: 'WAITING', Limit: 0, Sort: "-priority", Restrict: "",
       'SHOW': {
-        'OWNER': true,
+        'OWNER': false,
         'PERCENT': true,
       },
     },
@@ -57,7 +57,9 @@ var config_data = {
     // Default task template
     'TASK_TEMPLATE': '\r\n\r\n### TODO:\r\n\r\n\r\n\r\n### STATUS:\r\n\r\n\r\n\r\n### ISSUES:\r\n\r\n\r\n\r\n### REFERENCE:\r\n\r\n\r\n\r\n',
 
-    'DATE_FORMAT': 'dd-MMM',
+    'DATE_FORMAT': 'MM/dd/yy',
+
+    'USE_CATEGORY_COLORS': true,
 
     'SAVE_STATE': true,     // Preserve state between window.reloads (privacy and search filter)
     'PRIVACY_FILTER': true, // Add filter to separately handle private tasks
@@ -77,7 +79,7 @@ var config_data = {
       'ACTION': 'ARCHIVE' // the options are: NONE, HIDE, ARCHIVE, DELETE
     },
 
-    'AUTO_UPDATE': false, // Switch for reloading the page after adding or editing tasks
+    'AUTO_UPDATE': true, // Switch for reloading the page after adding or editing tasks
 
   }
 };

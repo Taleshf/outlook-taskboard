@@ -48,6 +48,8 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
 
         $scope.config = CONFIG;
         $scope.usePrivate = CONFIG.PRIVACY_FILTER;
+        $scope.useCategoryColors = CONFIG.USE_CATEGORY_COLORS;
+        $scope.outlookCategories = getCategories();
         $scope.getState();
         $scope.initTasks();
 
@@ -194,22 +196,23 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
 
         var count = tasks.Count;
         for (i = 1; i <= count; i++) {
-            if (tasks(i).Status == folderStatus) {
+            var task = tasks(i);
+            if (task.Status == folderStatus) {
                 array.push({
-                    entryID: tasks(i).EntryID,
-                    subject: tasks(i).Subject,
-                    priority: tasks(i).Importance,
-                    startdate: new Date(tasks(i).StartDate),
-                    duedate: new Date(tasks(i).DueDate),
-                    sensitivity: tasks(i).Sensitivity,
-                    categories: tasks(i).Categories,
-                    notes: taskExcerpt(tasks(i).Body, CONFIG.TASKNOTE_EXCERPT),
-                    status: taskStatus(tasks(i).Status),
+                    entryID: task.EntryID,
+                    subject: task.Subject,
+                    priority: task.Importance,
+                    startdate: new Date(task.StartDate),
+                    duedate: new Date(task.DueDate),
+                    sensitivity: task.Sensitivity,
+                    categories: getCategoriesArray(task.Categories),
+                    notes: taskExcerpt(task.Body, CONFIG.TASKNOTE_EXCERPT),
+                    status: taskStatus(task.Status),
                     oneNoteTaskID: getUserProp(tasks(i), "OneNoteTaskID"),
                     oneNoteURL: getUserProp(tasks(i), "OneNoteURL"),
-                    completeddate: new Date(tasks(i).DateCompleted),
-                    percent: tasks(i).PercentComplete,
-                    owner: tasks(i).Owner,
+                    completeddate: new Date(task.DateCompleted),
+                    percent: task.PercentComplete,
+                    owner: task.Owner,
                 });
             }
         };
@@ -223,6 +226,115 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
 
         return sortedTasks;
     };
+
+
+
+    var getCategories = function () {
+        var i;
+        var catNames = [];
+        var catColors = [];
+        var categories = outlookNS.Categories;
+        var count = outlookNS.Categories.Count;
+        catNames.length = count;
+        catColors.length = count;
+        for (i = 1; i <= count; i++) {
+            catNames[i - 1] = categories(i).Name;
+            catColors[i - 1] = categories(i).Color;
+        };
+        return { names: catNames, colors: catColors };
+    }
+
+    var getCategoriesArray = function (csvCategories) {
+        var i;
+        var catStyles = [];
+        var categories = csvCategories.split(/[;,]+/);
+        catStyles.length = categories.length;
+        for (i = 0; i < categories.length; i++) {
+            categories[i] = categories[i].trim();
+            if ($scope.useCategoryColors) {
+                catStyles[i] = {
+                    label: categories[i], style: { "background-color": getColor(categories[i]), color: getContrastYIQ(getColor(categories[i])) }
+                }
+            }
+            else {
+                catStyles[i] = {
+                    label: categories[i], style: { color: "black" }
+                };
+            }
+        }
+        return catStyles;
+    }
+
+    // grabs values of user defined fields from outlook item object 
+    // currently used for getting onenote url info 
+    var getUserProp = function (item, prop) {
+        var userprop = item.UserProperties(prop);
+        var value = '';
+        if (userprop != null) {
+            value = userprop.Value;
+        }
+        return value;
+    };
+
+    // opens up onenote app and locates the page by using onenote uri 
+    $scope.openOneNoteURL = function (url) {
+        window.event.returnValue = false;
+        // try to open the link using msLaunchUri which does not create unsafe-link security warning 
+        // unfortunately this method is only available Win8+ 
+        if (navigator.msLaunchUri) {
+            navigator.msLaunchUri(url);
+        } else {
+            // old window.open method, this creates unsafe-link warning if the link clicked via outlook app 
+            // there is a registry key to disable these warnings, but not recommended as it disables 
+            // the unsafe-link protection in entire outlook app 
+            window.open(url, "_blank").close();
+        }
+        return nfalse;
+    }
+
+
+    var getColor = function (category) {
+        // this has to be optimized by using an arry
+        var c = $scope.outlookCategories.names.indexOf(category);
+        var i = $scope.outlookCategories.colors[c];
+        if (i == -1) return '#4f4f4f';
+        if (i == 1) return '#E7A1A2';
+        if (i == 2) return '#F9BA89';
+        if (i == 3) return '#F7DD8F';
+        if (i == 4) return '#FCFA90';
+        if (i == 5) return '#78D168';
+        if (i == 6) return '#9FDCC9';
+        if (i == 7) return '#C6D2B0';
+        if (i == 8) return '#9DB7E8';
+        if (i == 9) return '#B5A1E2';
+        if (i == 10) return '#daaec2';
+        if (i == 11) return '#dad9dc';
+        if (i == 12) return '#6b7994';
+        if (i == 13) return '#bfbfbf';
+        if (i == 14) return '#6f6f6f';
+        if (i == 15) return '#4f4f4f';
+        if (i == 16) return '#c11a25';
+        if (i == 17) return '#e2620d';
+        if (i == 18) return '#c79930';
+        if (i == 19) return '#b9b300';
+        if (i == 20) return '#368f2b';
+        if (i == 21) return '#329b7a';
+        if (i == 22) return '#778b45';
+        if (i == 23) return '#2858a5';
+        if (i == 24) return '#5c3fa3';
+        if (i == 25) return '#93446b';
+    }
+
+    function getContrastYIQ(hexcolor) {
+        if (hexcolor == undefined) {
+            return 'black';
+        }
+        var r = parseInt(hexcolor.substr(1, 2), 16);
+        var g = parseInt(hexcolor.substr(3, 2), 16);
+        var b = parseInt(hexcolor.substr(5, 2), 16);
+        var yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+        return (yiq >= 128) ? 'black' : 'white';
+    }
 
     $scope.initTasks = function () {
         // get tasks from each outlook folder and populate model data
@@ -345,7 +457,7 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
         $scope.private = state.private;
     }
 
-	// this is only a proof-of-concept single page report in a draft email for weekly report
+    // this is only a proof-of-concept single page report in a draft email for weekly report
     // it will be improved later on
     $scope.createReport = function () {
         var i, array = [];
@@ -368,8 +480,8 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
         var count = tasks.Count;
         for (i = 1; i <= count; i++) {
             mailBody += "<li>"
-			if (tasks(i).Categories !== "") { mailBody += "[" + tasks(i).Categories + "] "; } 
-			mailBody += "<strong>" + tasks(i).Subject + "</strong>" + " - <i>" + taskStatus(tasks(i).Status) + "</i>";
+            if (tasks(i).Categories !== "") { mailBody += "[" + tasks(i).Categories + "] "; }
+            mailBody += "<strong>" + tasks(i).Subject + "</strong>" + " - <i>" + taskStatus(tasks(i).Status) + "</i>";
             if (tasks(i).Importance == 2) { mailBody += "<font color=red> [H]</font>"; }
             if (tasks(i).Importance == 0) { mailBody += "<font color=gray> [L]</font>"; }
             var dueDate = new Date(tasks(i).DueDate);
@@ -378,7 +490,7 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
             mailBody += "</li>";
         }
         mailBody += "</ul>";
-		
+
         // INPROGRESS ITEMS
         var tasks = getOutlookFolder(CONFIG.INPROGRESS_FOLDER.Name).Items.Restrict("[Status] = 1 And Not ([Sensitivity] = 2)");
         tasks.Sort("[Importance][Status]", true);
@@ -387,8 +499,8 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
         var count = tasks.Count;
         for (i = 1; i <= count; i++) {
             mailBody += "<li>"
-			if (tasks(i).Categories !== "") { mailBody += "[" + tasks(i).Categories + "] "; } 
-			mailBody += "<strong>" + tasks(i).Subject + "</strong>" + " - <i>" + taskStatus(tasks(i).Status) + "</i>";
+            if (tasks(i).Categories !== "") { mailBody += "[" + tasks(i).Categories + "] "; }
+            mailBody += "<strong>" + tasks(i).Subject + "</strong>" + " - <i>" + taskStatus(tasks(i).Status) + "</i>";
             if (tasks(i).Importance == 2) { mailBody += "<font color=red> [H]</font>"; }
             if (tasks(i).Importance == 0) { mailBody += "<font color=gray> [L]</font>"; }
             var dueDate = new Date(tasks(i).DueDate);
@@ -399,16 +511,16 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
         mailBody += "</ul>";
 
         // WAITING ITEMS
-//       var tasks = getOutlookFolder(CONFIG.WAITING_FOLDER.Name).Items.Restrict("[Complete] = false And Not ([Sensitivity] = 2)");
-		var tasks = getOutlookFolder(CONFIG.WAITING_FOLDER.Name).Items.Restrict("[Status] = 3 And Not ([Sensitivity] = 2)");
+        //       var tasks = getOutlookFolder(CONFIG.WAITING_FOLDER.Name).Items.Restrict("[Complete] = false And Not ([Sensitivity] = 2)");
+        var tasks = getOutlookFolder(CONFIG.WAITING_FOLDER.Name).Items.Restrict("[Status] = 3 And Not ([Sensitivity] = 2)");
         tasks.Sort("[Importance][Status]", true);
         mailBody += "<h3>" + CONFIG.WAITING_FOLDER.Title + "</h3>";
         mailBody += "<ul>";
         var count = tasks.Count;
         for (i = 1; i <= count; i++) {
             mailBody += "<li>"
-			if (tasks(i).Categories !== "") { mailBody += "[" + tasks(i).Categories + "] "; } 
-			mailBody += "<strong>" + tasks(i).Subject + "</strong>" + " - <i>" + taskStatus(tasks(i).Status) + "</i>";
+            if (tasks(i).Categories !== "") { mailBody += "[" + tasks(i).Categories + "] "; }
+            mailBody += "<strong>" + tasks(i).Subject + "</strong>" + " - <i>" + taskStatus(tasks(i).Status) + "</i>";
             if (tasks(i).Importance == 2) { mailBody += "<font color=red> [H]</font>"; }
             if (tasks(i).Importance == 0) { mailBody += "<font color=gray> [L]</font>"; }
             var dueDate = new Date(tasks(i).DueDate);
@@ -426,8 +538,8 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
         var count = tasks.Count;
         for (i = 1; i <= count; i++) {
             mailBody += "<li>"
-			if (tasks(i).Categories !== "") { mailBody += "[" + tasks(i).Categories + "] "; } 
-			mailBody += "<strong>" + tasks(i).Subject + "</strong>" + " - <i>" + taskStatus(tasks(i).Status) + "</i>";
+            if (tasks(i).Categories !== "") { mailBody += "[" + tasks(i).Categories + "] "; }
+            mailBody += "<strong>" + tasks(i).Subject + "</strong>" + " - <i>" + taskStatus(tasks(i).Status) + "</i>";
             if (tasks(i).Importance == 2) { mailBody += "<font color=red> [H]</font>"; }
             if (tasks(i).Importance == 0) { mailBody += "<font color=gray> [L]</font>"; }
             var dueDate = new Date(tasks(i).DueDate);
@@ -472,17 +584,6 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
         if (status == CONFIG.STATUS.WAITING.Value) { str = CONFIG.STATUS.WAITING.Text; }
         if (status == CONFIG.STATUS.COMPLETED.Value) { str = CONFIG.STATUS.COMPLETED.Text; }
         return str;
-    };
-
-    // grabs values of user defined fields from outlook item object
-    // currently used for getting onenote url info
-    var getUserProp = function (item, prop) {
-        var userprop = item.UserProperties(prop);
-        var value = '';
-        if (userprop != null) {
-            value = userprop.Value;
-        }
-        return value;
     };
 
     // create a new task under target folder
@@ -559,10 +660,8 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
             taskitem.Delete();
 
             // locate and remove the item from the models
-            var index = sourceArray.indexOf(item);
-            if (index != -1) { sourceArray.splice(index, 1); }
-            index = filteredSourceArray.indexOf(item);
-            if (index != -1) { filteredSourceArray.splice(index, 1); }
+            removeItemFromArray(item, sourceArray);
+            removeItemFromArray(item, filteredSourceArray);
         };
     };
 
@@ -579,10 +678,13 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
         };
 
         // locate and remove the item from the models
-        var index = sourceArray.indexOf(item);
-        if (index != -1) { sourceArray.splice(index, 1); }
-        index = filteredSourceArray.indexOf(item);
-        if (index != -1) { filteredSourceArray.splice(index, 1); }
+        removeItemFromArray(item, sourceArray);
+        removeItemFromArray(item, filteredSourceArray);
+    };
+
+    var removeItemFromArray = function (item, array) {
+        var index = array.indexOf(item);
+        if (index != -1) { array.splice(index, 1); }
     };
 
     // checks whether the task date is overdue or today
@@ -592,22 +694,6 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
         var today = new Date().setHours(0, 0, 0, 0);
         return { 'task-overdue': dateobj < today, 'task-today': dateobj == today };
     };
-
-    // opens up onenote app and locates the page by using onenote uri
-    $scope.openOneNoteURL = function (url) {
-        window.event.returnValue = false;
-        // try to open the link using msLaunchUri which does not create unsafe-link security warning
-        // unfortunately this method is only available Win8+
-        if (navigator.msLaunchUri) {
-            navigator.msLaunchUri(url);
-        } else {
-            // old window.open method, this creates unsafe-link warning if the link clicked via outlook app
-            // there is a registry key to disable these warnings, but not recommended as it disables
-            // the unsafe-link protection in entire outlook app
-            window.open(url, "_blank").close();
-        }
-        return false;
-    }
 
     Date.daysBetween = function (date1, date2) {
         //Get 1 day in milliseconds
