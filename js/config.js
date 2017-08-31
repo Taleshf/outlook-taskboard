@@ -17,35 +17,50 @@ var config_data = {
         'OWNER': false,
         'PERCENT': false,
       },
-      'FILTER_ON_START_DATE': false,
+      'FILTER_ON_START_DATE': true,
+      'REPORT': {
+        'SHOW': true,
+      }
     },
     'NEXT_FOLDER': {
-      Name: '', Title: 'NEXT', Limit: 0, Sort: "duedate,-priority", Restrict: "[status] = 0 AND ([startdate] <> '' OR [duedate] <> '') ",
+      Name: 'Kanban', Title: 'NEXT', Limit: 20, Sort: "duedate,-priority", Restrict: "",
       'SHOW': {
         'OWNER': false,
         'PERCENT': false,
       },
+      'REPORT': {
+        'SHOW': false,
+      }
     },
     'INPROGRESS_FOLDER': {
-      Name: '', Title: 'IN PROGRESS', Limit: 0, Sort: "-priority", Restrict: "",
+      Name: 'Kanban', Title: 'IN PROGRESS', Limit: 5, Sort: "-priority", Restrict: "",
       'SHOW': {
         'OWNER': false,
         'PERCENT': true,
       },
+      'REPORT': {
+        'SHOW': true,
+      }
     },
     'WAITING_FOLDER': {
-      Name: '', Title: 'WAITING', Limit: 0, Sort: "-priority", Restrict: "",
+      Name: 'Kanban', Title: 'WAITING', Limit: 0, Sort: "-priority", Restrict: "",
       'SHOW': {
         'OWNER': false,
         'PERCENT': true,
       },
+      'REPORT': {
+        'SHOW': true,
+      }
     },
     'COMPLETED_FOLDER': {
-      Name: '', Title: 'COMPLETED', Limit: 0, Sort: "-completeddate,-priority,subject", Restrict: "",
+      Name: 'Kanban', Title: 'COMPLETED', Limit: 0, Sort: "-completeddate,-priority,subject", Restrict: "",
       'SHOW': {
         'OWNER': false,
         'PERCENT': false,
       },
+      'REPORT': {
+        'SHOW': true,
+      }
     },
     'ARCHIVE_FOLDER': { Name: 'Completed' },
 
@@ -57,7 +72,7 @@ var config_data = {
     // Default task template
     'TASK_TEMPLATE': '\r\n\r\n### TODO:\r\n\r\n\r\n\r\n### STATUS:\r\n\r\n\r\n\r\n### ISSUES:\r\n\r\n\r\n\r\n### REFERENCE:\r\n\r\n\r\n\r\n',
 
-    'DATE_FORMAT': 'MM/dd/yy',
+    'DATE_FORMAT': 'dd-MMM',
 
     'USE_CATEGORY_COLORS': true,
 
