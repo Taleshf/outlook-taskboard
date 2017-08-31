@@ -23,7 +23,7 @@ var config_data = {
       }
     },
     'NEXT_FOLDER': {
-      Name: 'Kanban', Title: 'NEXT', Limit: 20, Sort: "duedate,-priority", Restrict: "",
+      Name: '', Title: 'NEXT', Limit: 0, Sort: "duedate,-priority", Restrict: "",
       'SHOW': {
         'OWNER': false,
         'PERCENT': false,
@@ -33,7 +33,7 @@ var config_data = {
       }
     },
     'INPROGRESS_FOLDER': {
-      Name: 'Kanban', Title: 'IN PROGRESS', Limit: 5, Sort: "-priority", Restrict: "",
+      Name: '', Title: 'IN PROGRESS', Limit: 0, Sort: "-priority", Restrict: "",
       'SHOW': {
         'OWNER': false,
         'PERCENT': true,
@@ -43,7 +43,7 @@ var config_data = {
       }
     },
     'WAITING_FOLDER': {
-      Name: 'Kanban', Title: 'WAITING', Limit: 0, Sort: "-priority", Restrict: "",
+      Name: '', Title: 'WAITING', Limit: 0, Sort: "-priority", Restrict: "",
       'SHOW': {
         'OWNER': false,
         'PERCENT': true,
@@ -53,7 +53,7 @@ var config_data = {
       }
     },
     'COMPLETED_FOLDER': {
-      Name: 'Kanban', Title: 'COMPLETED', Limit: 0, Sort: "-completeddate,-priority,subject", Restrict: "",
+      Name: '', Title: 'COMPLETED', Limit: 0, Sort: "-completeddate,-priority,subject", Restrict: "",
       'SHOW': {
         'OWNER': false,
         'PERCENT': false,
