@@ -66,7 +66,8 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
                 // but allows sorting within the lane
                 if ((CONFIG.INPROGRESS_FOLDER.Limit !== 0 && e.target.id !== 'inprogressList' && ui.item.sortable.droptarget.attr('id') === 'inprogressList' && $scope.inprogressTasks.length >= CONFIG.INPROGRESS_FOLDER.Limit) ||
                     (CONFIG.NEXT_FOLDER.Limit !== 0 && e.target.id !== 'nextList' && ui.item.sortable.droptarget.attr('id') === 'nextList' && $scope.nextTasks.length >= CONFIG.NEXT_FOLDER.Limit) ||
-                    (CONFIG.WAITING_FOLDER.Limit !== 0 && e.target.id !== 'waitingList' && ui.item.sortable.droptarget.attr('id') === 'waitingList' && $scope.waitingTasks.length >= CONFIG.WAITING_FOLDER.Limit)) {
+                    (CONFIG.WAITING_FOLDER.Limit !== 0 && e.target.id !== 'waitingList' && ui.item.sortable.droptarget.attr('id') === 'waitingList' && $scope.waitingTasks.length >= CONFIG.WAITING_FOLDER.Limit) ||
+					(CONFIG.DEFERRED_FOLDER.Limit !== 0 && e.target.id !== 'deferredList' && ui.item.sortable.droptarget.attr('id') === 'deferredList' && $scope.deferredTasks.length >= CONFIG.DEFERRED_FOLDER.Limit)) {
                     ui.item.sortable.cancel();
                 }
             },
@@ -88,6 +89,10 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
                         case 'inprogressList':
                             var tasksfolder = getOutlookFolder(CONFIG.INPROGRESS_FOLDER.Name);
                             var newstatus = CONFIG.STATUS.IN_PROGRESS.Value;
+                            break;
+						case 'deferredList':
+                            var tasksfolder = getOutlookFolder(CONFIG.DEFERRED_FOLDER.Name);
+                            var newstatus = CONFIG.STATUS.DEFERRED.Value;
                             break;
                         case 'waitingList':
                             var tasksfolder = getOutlookFolder(CONFIG.WAITING_FOLDER.Name);
@@ -154,6 +159,15 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
         }
         return folder;
     }
+	
+	var getTasksCount = function () {
+    var i, path, array = [];
+	//passing empty variable for the path to get the count of the default folder
+    var tasks = getOutlookFolder(path).Items;
+
+        var count = tasks.Count;
+		return count;
+        };
 
     // borrowed from http://stackoverflow.com/a/30446887/942100
     var fieldSorter = function (fields) {
@@ -294,7 +308,7 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
 
 
     var getColor = function (category) {
-        // this has to be optimized by using an arry
+        // this has to be optimized by using an array
         var c = $scope.outlookCategories.names.indexOf(category);
         var i = $scope.outlookCategories.colors[c];
         if (i == -1) return '#4f4f4f';
@@ -340,6 +354,7 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
         // get tasks from each outlook folder and populate model data
         $scope.backlogTasks = getTasksFromOutlook(CONFIG.BACKLOG_FOLDER.Name, CONFIG.BACKLOG_FOLDER.Restrict, CONFIG.BACKLOG_FOLDER.Sort, CONFIG.STATUS.NOT_STARTED.Value);
         $scope.inprogressTasks = getTasksFromOutlook(CONFIG.INPROGRESS_FOLDER.Name, CONFIG.INPROGRESS_FOLDER.Restrict, CONFIG.INPROGRESS_FOLDER.Sort, CONFIG.STATUS.IN_PROGRESS.Value);
+		$scope.deferredTasks = getTasksFromOutlook(CONFIG.DEFERRED_FOLDER.Name, CONFIG.DEFERRED_FOLDER.Restrict, CONFIG.DEFERRED_FOLDER.Sort, CONFIG.STATUS.DEFERRED.Value);
         $scope.nextTasks = getTasksFromOutlook(CONFIG.NEXT_FOLDER.Name, CONFIG.NEXT_FOLDER.Restrict, CONFIG.NEXT_FOLDER.Sort, CONFIG.STATUS.NOT_STARTED.Value);
         $scope.waitingTasks = getTasksFromOutlook(CONFIG.WAITING_FOLDER.Name, CONFIG.WAITING_FOLDER.Restrict, CONFIG.WAITING_FOLDER.Sort, CONFIG.STATUS.WAITING.Value);
         $scope.completedTasks = getTasksFromOutlook(CONFIG.COMPLETED_FOLDER.Name, CONFIG.COMPLETED_FOLDER.Restrict, CONFIG.COMPLETED_FOLDER.Sort, CONFIG.STATUS.COMPLETED.Value);
@@ -347,14 +362,18 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
         // copy the lists as the initial filter    
         $scope.filteredBacklogTasks = $scope.backlogTasks;
         $scope.filteredInprogressTasks = $scope.inprogressTasks;
+		$scope.filteredDeferredTasks = $scope.deferredTasks;
         $scope.filteredNextTasks = $scope.nextTasks;
         $scope.filteredWaitingTasks = $scope.waitingTasks;
         $scope.filteredCompletedTasks = $scope.completedTasks;
+		
+		//perform the count of all  tasks
+		$scope.tasksCount = getTasksCount();
 
         // then apply the current filters for search and sensitivity
         $scope.applyFilters();
 
-        // cleran up Completed Tasks
+        // clear up Completed Tasks
         if (CONFIG.COMPLETED.ACTION == 'ARCHIVE' || CONFIG.COMPLETED.ACTION == 'DELETE') {
             var i;
             var tasks = $scope.completedTasks;
@@ -380,6 +399,7 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
             $scope.filteredNextTasks = $filter('filter')($scope.nextTasks, $scope.search);
             $scope.filteredInprogressTasks = $filter('filter')($scope.inprogressTasks, $scope.search);
             $scope.filteredWaitingTasks = $filter('filter')($scope.waitingTasks, $scope.search);
+			$scope.filteredDeferredTasks = $filter('filter')($scope.deferredTasks, $scope.search);
             $scope.filteredCompletedTasks = $filter('filter')($scope.completedTasks, $scope.search);
         }
         else {
@@ -387,6 +407,7 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
             $scope.filteredInprogressTasks = $scope.inprogressTasks;
             $scope.filteredNextTasks = $scope.nextTasks;
             $scope.filteredWaitingTasks = $scope.waitingTasks;
+			$scope.filteredDeferredTasks = $scope.deferredTasks;
             $scope.filteredCompletedTasks = $scope.completedTasks;
         }
         // I think this can be written shorter, but for now it works
@@ -397,6 +418,7 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
             $scope.filteredNextTasks = $filter('filter')($scope.filteredNextTasks, function (task) { return task.sensitivity == sensitivityFilter });
             $scope.filteredInprogressTasks = $filter('filter')($scope.filteredInprogressTasks, function (task) { return task.sensitivity == sensitivityFilter });
             $scope.filteredWaitingTasks = $filter('filter')($scope.filteredWaitingTasks, function (task) { return task.sensitivity == sensitivityFilter });
+			$scope.filteredDeferredTasks = $filter('filter')($scope.filteredDeferredTasks, function (task) { return task.sensitivity == sensitivityFilter });
             $scope.filteredCompletedTasks = $filter('filter')($scope.filteredCompletedTasks, function (task) { return task.sensitivity == sensitivityFilter });
         }
 
@@ -483,8 +505,50 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
                 mailBody += "<li>"
                 if (tasks(i).Categories !== "") { mailBody += "[" + tasks(i).Categories + "] "; }
                 mailBody += "<strong>" + tasks(i).Subject + "</strong>" + " - <i>" + taskStatus(tasks(i).Status) + "</i>";
-                if (tasks(i).Importance == 2) { mailBody += "<font color=red> [H]</font>"; }
-                if (tasks(i).Importance == 0) { mailBody += "<font color=gray> [L]</font>"; }
+                if (tasks(i).Importance == 2) { mailBody += "<font color=red> [High]</font>"; }
+                if (tasks(i).Importance == 0) { mailBody += "<font color=gray> [Low]</font>"; }
+                var dueDate = new Date(tasks(i).DueDate);
+                if (moment(dueDate).isValid && moment(dueDate).year() != 4501) { mailBody += " [Due: " + moment(dueDate).format("DD-MMM") + "]"; }
+                if (taskExcerpt(tasks(i).Body, 10000)) { mailBody += "<br>" + "<font color=gray>" + taskExcerpt(tasks(i).Body, 10000) + "</font>"; }
+                mailBody += "</li>";
+            }
+            mailBody += "</ul>";
+        }
+		
+		// DEFERRED ITEMS
+        if (CONFIG.DEFERRED_FOLDER.REPORT.SHOW) {
+            var tasks = getOutlookFolder(CONFIG.DEFERRED_FOLDER.Name).Items.Restrict("[Status] = 4 And Not ([Sensitivity] = 2)");
+            tasks.Sort("[Importance][Status]", true);
+            mailBody += "<h3>" + CONFIG.DEFERRED_FOLDER.Title + "</h3>";
+            mailBody += "<ul>";
+            var count = tasks.Count;
+            for (i = 1; i <= count; i++) {
+                mailBody += "<li>"
+                if (tasks(i).Categories !== "") { mailBody += "[" + tasks(i).Categories + "] "; }
+                mailBody += "<strong>" + tasks(i).Subject + "</strong>" + " - <i>" + taskStatus(tasks(i).Status) + "</i>";
+                if (tasks(i).Importance == 2) { mailBody += "<font color=red> [High]</font>"; }
+                if (tasks(i).Importance == 0) { mailBody += "<font color=gray> [Low]</font>"; }
+                var dueDate = new Date(tasks(i).DueDate);
+                if (moment(dueDate).isValid && moment(dueDate).year() != 4501) { mailBody += " [Due: " + moment(dueDate).format("DD-MMM") + "]"; }
+                if (taskExcerpt(tasks(i).Body, 10000)) { mailBody += "<br>" + "<font color=gray>" + taskExcerpt(tasks(i).Body, 10000) + "</font>"; }
+                mailBody += "</li>";
+            }
+            mailBody += "</ul>";
+        }
+		
+		// WAITING ITEMS
+        if (CONFIG.WAITING_FOLDER.REPORT.SHOW) {
+            var tasks = getOutlookFolder(CONFIG.WAITING_FOLDER.Name).Items.Restrict("[Status] = 3 And Not ([Sensitivity] = 2)");
+            tasks.Sort("[Importance][Status]", true);
+            mailBody += "<h3>" + CONFIG.WAITING_FOLDER.Title + "</h3>";
+            mailBody += "<ul>";
+            var count = tasks.Count;
+            for (i = 1; i <= count; i++) {
+                mailBody += "<li>"
+                if (tasks(i).Categories !== "") { mailBody += "[" + tasks(i).Categories + "] "; }
+                mailBody += "<strong>" + tasks(i).Subject + "</strong>" + " - <i>" + taskStatus(tasks(i).Status) + "</i>";
+                if (tasks(i).Importance == 2) { mailBody += "<font color=red> [High]</font>"; }
+                if (tasks(i).Importance == 0) { mailBody += "<font color=gray> [Low]</font>"; }
                 var dueDate = new Date(tasks(i).DueDate);
                 if (moment(dueDate).isValid && moment(dueDate).year() != 4501) { mailBody += " [Due: " + moment(dueDate).format("DD-MMM") + "]"; }
                 if (taskExcerpt(tasks(i).Body, 10000)) { mailBody += "<br>" + "<font color=gray>" + taskExcerpt(tasks(i).Body, 10000) + "</font>"; }
@@ -504,8 +568,8 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
                 mailBody += "<li>"
                 if (tasks(i).Categories !== "") { mailBody += "[" + tasks(i).Categories + "] "; }
                 mailBody += "<strong>" + tasks(i).Subject + "</strong>" + " - <i>" + taskStatus(tasks(i).Status) + "</i>";
-                if (tasks(i).Importance == 2) { mailBody += "<font color=red> [H]</font>"; }
-                if (tasks(i).Importance == 0) { mailBody += "<font color=gray> [L]</font>"; }
+                if (tasks(i).Importance == 2) { mailBody += "<font color=red> [High]</font>"; }
+                if (tasks(i).Importance == 0) { mailBody += "<font color=gray> [Low]</font>"; }
                 var dueDate = new Date(tasks(i).DueDate);
                 if (moment(dueDate).isValid && moment(dueDate).year() != 4501) { mailBody += " [Due: " + moment(dueDate).format("DD-MMM") + "]"; }
                 if (taskExcerpt(tasks(i).Body, 10000)) { mailBody += "<br>" + "<font color=gray>" + taskExcerpt(tasks(i).Body, 10000) + "</font>"; }
@@ -514,7 +578,7 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
             mailBody += "</ul>";
         }
 
-        // NEXT ITEMS
+        // NOT STARTED ITEMS
         if (CONFIG.NEXT_FOLDER.REPORT.SHOW) {
             var tasks = getOutlookFolder(CONFIG.NEXT_FOLDER.Name).Items.Restrict("[Status] = 0 And Not ([Sensitivity] = 2)");
             tasks.Sort("[Importance][Status]", true);
@@ -525,8 +589,8 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
                 mailBody += "<li>"
                 if (tasks(i).Categories !== "") { mailBody += "[" + tasks(i).Categories + "] "; }
                 mailBody += "<strong>" + tasks(i).Subject + "</strong>" + " - <i>" + taskStatus(tasks(i).Status) + "</i>";
-                if (tasks(i).Importance == 2) { mailBody += "<font color=red> [H]</font>"; }
-                if (tasks(i).Importance == 0) { mailBody += "<font color=gray> [L]</font>"; }
+                if (tasks(i).Importance == 2) { mailBody += "<font color=red> [High]</font>"; }
+                if (tasks(i).Importance == 0) { mailBody += "<font color=gray> [Low]</font>"; }
                 var dueDate = new Date(tasks(i).DueDate);
                 if (moment(dueDate).isValid && moment(dueDate).year() != 4501) { mailBody += " [Due: " + moment(dueDate).format("DD-MMM") + "]"; }
                 if (taskExcerpt(tasks(i).Body, 10000)) { mailBody += "<br>" + "<font color=gray>" + taskExcerpt(tasks(i).Body, 10000) + "</font>"; }
@@ -534,48 +598,28 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
             }
             mailBody += "</ul>";
         }
-
-        // WAITING ITEMS
-        if (CONFIG.WAITING_FOLDER.REPORT.SHOW) {
-            var tasks = getOutlookFolder(CONFIG.WAITING_FOLDER.Name).Items.Restrict("[Status] = 3 And Not ([Sensitivity] = 2)");
-            tasks.Sort("[Importance][Status]", true);
-            mailBody += "<h3>" + CONFIG.WAITING_FOLDER.Title + "</h3>";
-            mailBody += "<ul>";
-            var count = tasks.Count;
-            for (i = 1; i <= count; i++) {
-                mailBody += "<li>"
-                if (tasks(i).Categories !== "") { mailBody += "[" + tasks(i).Categories + "] "; }
-                mailBody += "<strong>" + tasks(i).Subject + "</strong>" + " - <i>" + taskStatus(tasks(i).Status) + "</i>";
-                if (tasks(i).Importance == 2) { mailBody += "<font color=red> [H]</font>"; }
-                if (tasks(i).Importance == 0) { mailBody += "<font color=gray> [L]</font>"; }
-                var dueDate = new Date(tasks(i).DueDate);
-                if (moment(dueDate).isValid && moment(dueDate).year() != 4501) { mailBody += " [Due: " + moment(dueDate).format("DD-MMM") + "]"; }
-                if (taskExcerpt(tasks(i).Body, 10000)) { mailBody += "<br>" + "<font color=gray>" + taskExcerpt(tasks(i).Body, 10000) + "</font>"; }
-                mailBody += "</li>";
-            }
-            mailBody += "</ul>";
-        }
+		
 
         // BACKLOG ITEMS
-        if (CONFIG.BACKLOG_FOLDER.REPORT.SHOW) {
-            var tasks = getOutlookFolder(CONFIG.BACKLOG_FOLDER.Name).Items.Restrict("[Status] = 0 And Not ([Sensitivity] = 2)");
-            tasks.Sort("[Importance][Status]", true);
-            mailBody += "<h3>" + CONFIG.BACKLOG_FOLDER.Title + "</h3>";
-            mailBody += "<ul>";
-            var count = tasks.Count;
-            for (i = 1; i <= count; i++) {
-                mailBody += "<li>"
-                if (tasks(i).Categories !== "") { mailBody += "[" + tasks(i).Categories + "] "; }
-                mailBody += "<strong>" + tasks(i).Subject + "</strong>" + " - <i>" + taskStatus(tasks(i).Status) + "</i>";
-                if (tasks(i).Importance == 2) { mailBody += "<font color=red> [H]</font>"; }
-                if (tasks(i).Importance == 0) { mailBody += "<font color=gray> [L]</font>"; }
-                var dueDate = new Date(tasks(i).DueDate);
-                if (moment(dueDate).isValid && moment(dueDate).year() != 4501) { mailBody += " [Due: " + moment(dueDate).format("DD-MMM") + "]"; }
-                if (taskExcerpt(tasks(i).Body, 10000)) { mailBody += "<br>" + "<font color=gray>" + taskExcerpt(tasks(i).Body, 10000) + "</font>"; }
-                mailBody += "</li>";
-            }
-            mailBody += "</ul>";
-        }
+        // if (CONFIG.BACKLOG_FOLDER.REPORT.SHOW) {
+            // var tasks = getOutlookFolder(CONFIG.BACKLOG_FOLDER.Name).Items.Restrict("[Status] = 0 And Not ([Sensitivity] = 2)");
+            // tasks.Sort("[Importance][Status]", true);
+            // mailBody += "<h3>" + CONFIG.BACKLOG_FOLDER.Title + "</h3>";
+            // mailBody += "<ul>";
+            // var count = tasks.Count;
+            // for (i = 1; i <= count; i++) {
+                // mailBody += "<li>"
+                // if (tasks(i).Categories !== "") { mailBody += "[" + tasks(i).Categories + "] "; }
+                // mailBody += "<strong>" + tasks(i).Subject + "</strong>" + " - <i>" + taskStatus(tasks(i).Status) + "</i>";
+                // if (tasks(i).Importance == 2) { mailBody += "<font color=red> [High]</font>"; }
+                // if (tasks(i).Importance == 0) { mailBody += "<font color=gray> [Low]</font>"; }
+                // var dueDate = new Date(tasks(i).DueDate);
+                // if (moment(dueDate).isValid && moment(dueDate).year() != 4501) { mailBody += " [Due: " + moment(dueDate).format("DD-MMM") + "]"; }
+                // if (taskExcerpt(tasks(i).Body, 10000)) { mailBody += "<br>" + "<font color=gray>" + taskExcerpt(tasks(i).Body, 10000) + "</font>"; }
+                // mailBody += "</li>";
+            // }
+            // mailBody += "</ul>";
+        // }
 
         mailBody += "</body>"
 
@@ -610,6 +654,7 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
         if (status == CONFIG.STATUS.IN_PROGRESS.Value) { str = CONFIG.STATUS.IN_PROGRESS.Text; }
         if (status == CONFIG.STATUS.WAITING.Value) { str = CONFIG.STATUS.WAITING.Text; }
         if (status == CONFIG.STATUS.COMPLETED.Value) { str = CONFIG.STATUS.COMPLETED.Text; }
+		if (status == CONFIG.STATUS.DEFERRED.Value) { str = CONFIG.STATUS.DEFERRED.Text; }
         return str;
     };
 

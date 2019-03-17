@@ -23,13 +23,13 @@ var config_data = {
       }
     },
     'NEXT_FOLDER': {
-      Name: '', Title: 'NEXT', Limit: 0, Sort: "duedate,-priority", Restrict: "",
+      Name: '', Title: 'NOT STARTED', Limit: 0, Sort: "duedate,-priority", Restrict: "",
       'SHOW': {
         'OWNER': false,
         'PERCENT': false,
       },
       'REPORT': {
-        'SHOW': false,
+        'SHOW': true,
       }
     },
     'INPROGRESS_FOLDER': {
@@ -42,8 +42,18 @@ var config_data = {
         'SHOW': true,
       }
     },
+	'DEFERRED_FOLDER': {
+      Name: '', Title: 'DEFERRED', Limit: 0, Sort: "-priority", Restrict: "",
+      'SHOW': {
+        'OWNER': false,
+        'PERCENT': true,
+      },
+      'REPORT': {
+        'SHOW': true,
+      }
+    },
     'WAITING_FOLDER': {
-      Name: '', Title: 'WAITING', Limit: 0, Sort: "-priority", Restrict: "",
+      Name: '', Title: 'WAITING ON SOMEONE ELSE', Limit: 0, Sort: "-priority", Restrict: "",
       'SHOW': {
         'OWNER': false,
         'PERCENT': true,
@@ -55,7 +65,7 @@ var config_data = {
     'COMPLETED_FOLDER': {
       Name: '', Title: 'COMPLETED', Limit: 0, Sort: "-completeddate,-priority,subject", Restrict: "",
       'SHOW': {
-        'OWNER': false,
+        'OWNER': true,
         'PERCENT': false,
       },
       'REPORT': {
@@ -83,7 +93,8 @@ var config_data = {
     'STATUS': {
       'NOT_STARTED': { Value: 0, Text: "Not Started" },
       'IN_PROGRESS': { Value: 1, Text: "In Progress" },
-      'WAITING': { Value: 3, Text: "Waiting For Someone Else" },
+	  'DEFERRED': { Value: 4, Text: "Deferred" },
+      'WAITING': { Value: 3, Text: "Waiting On Someone Else" },
       'COMPLETED': { Value: 2, Text: "Completed" }
     },
 

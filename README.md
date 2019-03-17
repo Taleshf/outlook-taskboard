@@ -1,6 +1,23 @@
 # Outlook Taskboard
 Outlook Taskboard is a kanban board style view for Outlook Tasks.
 
+----- 03/17/19 ------
+
+Forked from BillyMcSkintos and added a few changes to suit my needs
+
+My changes:
+
+1. Removed Backlog Items lane - I really wanted to see the lanes reflecting the task status only.
+2. Added the Deferred lane - now you can move tasks on to the Deferred lane and make use of this status.
+3. Deferred items added to the report.
+4. Added tooltips to all available buttons.
+5. Added a count next to the "Outlook Taskboard" - Now you can see the total of all tasks on the board, including private items.
+6. Adjusted the colors acording to priorities - low(yellow), high(red), normal(white).
+7. Added deferred items to the private filter and adjusted filter clean up.
+
+
+----- End -----
+
 I found the original Kanban board implemented by Evren Varol. I looked at the forks and liked the 
 changes by BillyMcSkintos, using the task status instead of folders. But he lost the drag&drop
 feature.

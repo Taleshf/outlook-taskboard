@@ -76,7 +76,7 @@ li.task.task-high {
 }
 
 li.task.task-low {
-    background-color: #f5f5f5;
+    background-color: #ffff99;
     border: 1px solid #ccc;
 }
 
@@ -87,7 +87,7 @@ li.task.task-completed {
 
 .panel-default>.panel-heading-completed {
   color: #333;
-  background-color: #E7D4EA;
+  background-color: #80ff80;
   border-color: #ddd;
   padding-top: 5px;
   Padding-bottom: 5px;
@@ -97,7 +97,7 @@ li.task.task-completed {
 
 .panel-default>.panel-heading-waiting {
   color: #333;
-  background-color: #EBDD82;
+  background-color: #eee;
   border-color: #ddd;
   padding-top: 5px;
   Padding-bottom: 5px;
@@ -106,7 +106,7 @@ li.task.task-completed {
 }
 .panel-default>.panel-heading-progress {
   color: #333;
-  background-color: #AFCAD5;
+  background-color: #eee;
   border-color: #ddd;
   padding-top: 5px;
   Padding-bottom: 5px;
@@ -116,7 +116,7 @@ li.task.task-completed {
 
 .panel-default>.panel-heading-next {
   color: #333;
-  background-color: #D9E6CA;
+  background-color: #ffff4d;
   border-color: #ddd;
   padding-top: 5px;
   Padding-bottom: 5px;
