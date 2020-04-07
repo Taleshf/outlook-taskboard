@@ -49,6 +49,7 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
         $scope.config = CONFIG;
         $scope.usePrivate = CONFIG.PRIVACY_FILTER;
         $scope.useCategoryColors = CONFIG.USE_CATEGORY_COLORS;
+		$scope.showThemeOptions = CONFIG.USE_THEMES;
         $scope.outlookCategories = getCategories();
         $scope.getState();
         $scope.initTasks();
@@ -65,7 +66,7 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
                 // cancels dropping to the lane if it exceeds the limit
                 // but allows sorting within the lane
                 if ((CONFIG.INPROGRESS_FOLDER.Limit !== 0 && e.target.id !== 'inprogressList' && ui.item.sortable.droptarget.attr('id') === 'inprogressList' && $scope.inprogressTasks.length >= CONFIG.INPROGRESS_FOLDER.Limit) ||
-                    (CONFIG.NEXT_FOLDER.Limit !== 0 && e.target.id !== 'nextList' && ui.item.sortable.droptarget.attr('id') === 'nextList' && $scope.nextTasks.length >= CONFIG.NEXT_FOLDER.Limit) ||
+                    (CONFIG.NOTSTARTED_FOLDER.Limit !== 0 && e.target.id !== 'nextList' && ui.item.sortable.droptarget.attr('id') === 'nextList' && $scope.nextTasks.length >= CONFIG.NOTSTARTED_FOLDER.Limit) ||
                     (CONFIG.WAITING_FOLDER.Limit !== 0 && e.target.id !== 'waitingList' && ui.item.sortable.droptarget.attr('id') === 'waitingList' && $scope.waitingTasks.length >= CONFIG.WAITING_FOLDER.Limit) ||
 					(CONFIG.DEFERRED_FOLDER.Limit !== 0 && e.target.id !== 'deferredList' && ui.item.sortable.droptarget.attr('id') === 'deferredList' && $scope.deferredTasks.length >= CONFIG.DEFERRED_FOLDER.Limit)) {
                     ui.item.sortable.cancel();
@@ -83,7 +84,7 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
                             var newstatus = CONFIG.STATUS.NOT_STARTED.Value;
                             break;
                         case 'nextList':
-                            var tasksfolder = getOutlookFolder(CONFIG.NEXT_FOLDER.Name);
+                            var tasksfolder = getOutlookFolder(CONFIG.NOTSTARTED_FOLDER.Name);
                             var newstatus = CONFIG.STATUS.NOT_STARTED.Value;
                             break;
                         case 'inprogressList':
@@ -136,7 +137,7 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
         };
 
         // watch search filter and apply it
-        $scope.$watchGroup(['search', 'private'], function (newValues, oldValues) {
+        $scope.$watchGroup(['search', 'private', 'theme'], function (newValues, oldValues) {
             var search = newValues[0];
             $scope.applyFilters();
             $scope.saveState();
@@ -289,6 +290,45 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
         }
         return value;
     };
+	
+	//switching background color of the body between Light/Dark
+	$scope.switchTheme = function(){
+	//var currentBgColor = window.getComputedStyle(document.body, null).getPropertyValue('background-color');
+		if ($scope.theme == "Light"){
+			setTheme("Dark");
+		}
+		else{
+			setTheme("Light");
+		}
+	};
+	
+	var setTheme = function(theme){
+	var filterStyle;
+	var taskListStyle;
+	var i;
+	filterStyle = document.getElementById("filter").style;
+	taskListStyle = document.getElementsByClassName("panel-body tasklist list-unstyled");
+		if (theme == "Dark"){
+			$("body").css("background-color","#262626");
+			filterStyle.backgroundColor = "#595959";
+			filterStyle.color = "#d9d9d9";
+			//applying the style for all the tasklanes found under the same class
+			for (i = 0; i < taskListStyle.length; i++) {
+				taskListStyle[i].style.backgroundColor = "#404040";
+			}
+			$scope.theme = "Dark";
+		}
+		else{
+			$("body").css("background-color","#ffffff");
+			filterStyle.backgroundColor = "#ffffff";
+			filterStyle.color = "#a7afbe";
+			//applying the style for all the tasklanes found under the same class
+			for (i = 0; i < taskListStyle.length; i++) {
+				taskListStyle[i].style.backgroundColor = "#f5f5f5";
+			}
+			$scope.theme = "Light";
+		}
+	};
 
     // opens up onenote app and locates the page by using onenote uri 
     $scope.openOneNoteURL = function (url) {
@@ -355,7 +395,7 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
         $scope.backlogTasks = getTasksFromOutlook(CONFIG.BACKLOG_FOLDER.Name, CONFIG.BACKLOG_FOLDER.Restrict, CONFIG.BACKLOG_FOLDER.Sort, CONFIG.STATUS.NOT_STARTED.Value);
         $scope.inprogressTasks = getTasksFromOutlook(CONFIG.INPROGRESS_FOLDER.Name, CONFIG.INPROGRESS_FOLDER.Restrict, CONFIG.INPROGRESS_FOLDER.Sort, CONFIG.STATUS.IN_PROGRESS.Value);
 		$scope.deferredTasks = getTasksFromOutlook(CONFIG.DEFERRED_FOLDER.Name, CONFIG.DEFERRED_FOLDER.Restrict, CONFIG.DEFERRED_FOLDER.Sort, CONFIG.STATUS.DEFERRED.Value);
-        $scope.nextTasks = getTasksFromOutlook(CONFIG.NEXT_FOLDER.Name, CONFIG.NEXT_FOLDER.Restrict, CONFIG.NEXT_FOLDER.Sort, CONFIG.STATUS.NOT_STARTED.Value);
+        $scope.nextTasks = getTasksFromOutlook(CONFIG.NOTSTARTED_FOLDER.Name, CONFIG.NOTSTARTED_FOLDER.Restrict, CONFIG.NOTSTARTED_FOLDER.Sort, CONFIG.STATUS.NOT_STARTED.Value);
         $scope.waitingTasks = getTasksFromOutlook(CONFIG.WAITING_FOLDER.Name, CONFIG.WAITING_FOLDER.Restrict, CONFIG.WAITING_FOLDER.Sort, CONFIG.STATUS.WAITING.Value);
         $scope.completedTasks = getTasksFromOutlook(CONFIG.COMPLETED_FOLDER.Name, CONFIG.COMPLETED_FOLDER.Restrict, CONFIG.COMPLETED_FOLDER.Sort, CONFIG.STATUS.COMPLETED.Value);
 
@@ -369,6 +409,9 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
 		
 		//perform the count of all  tasks
 		$scope.tasksCount = getTasksCount();
+		
+		//set theme
+		setTheme($scope.theme);
 
         // then apply the current filters for search and sensitivity
         $scope.applyFilters();
@@ -444,7 +487,7 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
 
     $scope.saveState = function () {
         if (CONFIG.SAVE_STATE) {
-            var state = { "private": $scope.private, "search": $scope.search };
+            var state = { "private": $scope.private, "search": $scope.search, "theme": $scope.theme };
 
             var folder = outlookNS.GetDefaultFolder(11); // use the Journal folder to save the state
             var stateItems = folder.Items.Restrict('[Subject] = "KanbanState"');
@@ -462,7 +505,7 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
 
     $scope.getState = function () {
         // set default state
-        var state = { "private": false, "search": "" };
+        var state = { "private": false, "search": "", "theme": "Light" };
 
         if (CONFIG.SAVE_STATE) {
             var folder = outlookNS.GetDefaultFolder(11);
@@ -477,6 +520,7 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
 
         $scope.search = state.search;
         $scope.private = state.private;
+		$scope.theme = state.theme;
     }
 
     // this is only a proof-of-concept single page report in a draft email for weekly report
@@ -579,10 +623,10 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
         }
 
         // NOT STARTED ITEMS
-        if (CONFIG.NEXT_FOLDER.REPORT.SHOW) {
-            var tasks = getOutlookFolder(CONFIG.NEXT_FOLDER.Name).Items.Restrict("[Status] = 0 And Not ([Sensitivity] = 2)");
+        if (CONFIG.NOTSTARTED_FOLDER.REPORT.SHOW) {
+            var tasks = getOutlookFolder(CONFIG.NOTSTARTED_FOLDER.Name).Items.Restrict("[Status] = 0 And Not ([Sensitivity] = 2)");
             tasks.Sort("[Importance][Status]", true);
-            mailBody += "<h3>" + CONFIG.NEXT_FOLDER.Title + "</h3>";
+            mailBody += "<h3>" + CONFIG.NOTSTARTED_FOLDER.Title + "</h3>";
             mailBody += "<ul>";
             var count = tasks.Count;
             for (i = 1; i <= count; i++) {
@@ -669,7 +713,7 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
                 var tasksfolder = getOutlookFolder(CONFIG.INPROGRESS_FOLDER.Name);
                 break;
             case 'next':
-                var tasksfolder = getOutlookFolder(CONFIG.NEXT_FOLDER.Name);
+                var tasksfolder = getOutlookFolder(CONFIG.NOTSTARTED_FOLDER.Name);
                 break;
             case 'waiting':
                 var tasksfolder = getOutlookFolder(CONFIG.WAITING_FOLDER.Name);

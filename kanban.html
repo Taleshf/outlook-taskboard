@@ -5,8 +5,8 @@
 <head>
     <title>Outlook TaskBoard</title>
     <meta http-equiv="X-UA-Compatible" content="IE=11">
-
-    <link rel="stylesheet" href="css/bootstrap.min.css">
+	
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" href="css/taskboard.css">
 
     <!-- scripts -->
@@ -35,16 +35,19 @@
                     <div ng-show="(search != '')" class="input-group-addon">
                         <button class="btn btn-default btn-xs" aria-label="Clear" type="button" ng-click="search = ''" title="Clear filter"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
                     </div>
-                    <input type="text" name="search" ng-model="search" class="form-control" placeholder="Filter" />
+                    <input type="text" name="search" ng-model="search" class="form-control" placeholder="Filter" id="filter"/>
                     <div class="input-group-addon">
                         <button class="btn btn-default btn-xs" aria-label="Report" type="button" ng-click="createReport();" title="Create a report"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span></button>
                     </div>
                     <div ng-show="(usePrivate && private == true)" class="input-group-addon">
-                        <button class="btn btn-default btn-xs" ng-model="private" aria-label="Private" type="button" ng-click="private = !private" title="Click to remove private items filter"><span class="glyphicon glyphicon-lock" aria-hidden="true"></span></button>
+                        <button class="btn btn-default btn-xs" ng-model="private" aria-label="Private" type="button" ng-click="private = !private" title="Click to switch to global view"><span class="glyphicon glyphicon-globe" aria-hidden="true"></span></button>
                     </div>
                     <div ng-show="(usePrivate && private == false)" class="input-group-addon">
-                        <button class="btn btn-default btn-xs" ng-model="private" aria-label="Public" type="button" ng-click="private = !private" title="Click to enable private items filter"><span class="glyphicon glyphicon-globe" aria-hidden="true"></span></button>
+                        <button class="btn btn-default btn-xs" ng-model="private" aria-label="Public" type="button" ng-click="private = !private" title="Click to apply private items filter"><span class="glyphicon glyphicon-lock" aria-hidden="true"></span></button>
                     </div>
+					<div ng-show="(showThemeOptions)" class="input-group-addon">
+						<button class="btn btn-default btn-xs" ng-model="theme" aria-label="Switch" type="button" ng-click="switchTheme();" title="Switch Theme to Dark/Light"><span class="glyphicon glyphicon-adjust" aria-hidden="true"></span></button>
+					</div ng-show="(showThemeOptions)" class="input-group-addon">
                 </div>
             </div>
         </section>
@@ -58,11 +61,11 @@
             <div class="tasklane col-lg-2 col-md-3 col-sm-4 col-xs-6">
                 <div class="panel panel-default">
                     <header class="panel-heading-next">
-                        <h5>{{ config.NEXT_FOLDER.Title }} <span style="color:red">!</span>
+                        <h5>{{ config.NOTSTARTED_FOLDER.Title }} <span style="color:red">!</span>
                             <span class="pull-right">
-                                <button ng-if="( config.NEXT_FOLDER.Limit == 0 || nextTasks.length < config.NEXT_FOLDER.Limit )" class="btn btn-default btn-xs" aria-label="Add" type="button" ng-click="addTask('next');" title="Add a new task"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
-                            <span class="label label-info">{{ nextTasks.length }}</span> <span ng-if="( config.NEXT_FOLDER.Limit > 0 )"
-                                class="label label-primary">{{ config.NEXT_FOLDER.Limit }}</span>
+                                <button ng-if="( config.NOTSTARTED_FOLDER.Limit == 0 || nextTasks.length < config.NOTSTARTED_FOLDER.Limit )" class="btn btn-default btn-xs" aria-label="Add" type="button" ng-click="addTask('next');" title="Add a new task"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+                            <span class="label label-info">{{ nextTasks.length }}</span> <span ng-if="( config.NOTSTARTED_FOLDER.Limit > 0 )"
+                                class="label label-primary">{{ config.NOTSTARTED_FOLDER.Limit }}</span>
                             </span>
                         </h5>
                     </header>
@@ -75,8 +78,8 @@
                             </header>
                             <div class="panel-body"> {{ task.notes }} </div>
                             <footer class="text-right">
-								<div ng-if="( config.NEXT_FOLDER.SHOW.OWNER )"><span class="glyphicon glyphicon-user"></span> {{ task.owner }} </div>
-								<div ng-if="( config.NEXT_FOLDER.SHOW.PERCENT )" class="pull-right"> {{ task.percent }}%</div>
+								<div ng-if="( config.NOTSTARTED_FOLDER.SHOW.OWNER )"><span class="glyphicon glyphicon-user"></span> {{ task.owner }} </div>
+								<div ng-if="( config.NOTSTARTED_FOLDER.SHOW.PERCENT )" class="pull-right"> {{ task.percent }}%</div>
 								<div ng-if="(task.categories != '')" class="pull-left"><span class="glyphicon glyphicon-tag"></span>
 									<span ng-repeat="cat in task.categories"><strong ng-style="cat.style">{{ cat.label }}</strong>&nbsp;</span>
 								</div>

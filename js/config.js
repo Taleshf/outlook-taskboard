@@ -22,7 +22,7 @@ var config_data = {
         'SHOW': true,
       }
     },
-    'NEXT_FOLDER': {
+    'NOTSTARTED_FOLDER': {
       Name: '', Title: 'NOT STARTED', Limit: 0, Sort: "duedate,-priority", Restrict: "",
       'SHOW': {
         'OWNER': false,
@@ -88,6 +88,7 @@ var config_data = {
 
     'SAVE_STATE': true,     // Preserve state between window.reloads (privacy and search filter)
     'PRIVACY_FILTER': true, // Add filter to separately handle private tasks
+	'USE_THEMES': true,     // Allow user to switch between Light/Dark Themes
 
     // Outlook task statuses
     'STATUS': {
