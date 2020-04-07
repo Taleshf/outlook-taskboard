@@ -1,6 +1,14 @@
 # Outlook Taskboard
 Outlook Taskboard is a kanban board style view for Outlook Tasks.
 
+----- 04/07/20 ------
+
+1. Renamed settings from taskboard controller from NEXT_FOLDER to NOTSTARTED_FOLDER as this name suits the purpose better.
+2. Added a Theme Switch at the top right corner. Now you can switch from Light to Dark Mode and vice versa.
+3. Added the theme preference to the journal message to persist the user's choice when reloading the page.
+4. Added the 'USE_THEMES' option in the config.js file to make it a configurable option.
+5. Referenced the bootstrap css from maxcdn as the glyphicons were sometimes failing to load when loading css locally.
+
 ----- 03/17/19 ------
 
 Forked from BillyMcSkintos and added a few changes to suit my needs
