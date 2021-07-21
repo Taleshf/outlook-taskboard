@@ -1,5 +1,10 @@
 # Outlook Taskboard
 Outlook Taskboard is a kanban board style view for Outlook Tasks.
+----- 07/21/21 ------
+1. Added a new configuration option "CONFIG.REPORT_TO_FIELD" to allow set up of "To" field for report email.
+2. Added a new configuration option "CONFIG.USE_SIGNATURE_REPORT" to allow user to choose whether the deafult Outlook signature should be used.
+3. Removed "mailItem.BodyFormat = 2;" as this format would not allow the signature.
+4. Added "CONFIG.REPORT_DELIMITER" to allow customization of the characters users want to choose as a delimiter for the item description within the report.
 
 ----- 04/07/20 ------
 

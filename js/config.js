@@ -89,6 +89,9 @@ var config_data = {
     'SAVE_STATE': true,     // Preserve state between window.reloads (privacy and search filter)
     'PRIVACY_FILTER': true, // Add filter to separately handle private tasks
 	'USE_THEMES': true,     // Allow user to switch between Light/Dark Themes
+	'REPORT_DELIMITER': '###',   //Allow customization of report delimiter. This can be used to define how far the report summary will go.
+	'REPORT_TO_FIELD': '',              // Allow user to set specific email address to autopopulate report TO field.
+	'USE_SIGNATURE_REPORT': false,       // Makes use of user's default signature from Outlook when sending the report.
 
     // Outlook task statuses
     'STATUS': {

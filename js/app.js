@@ -51,6 +51,7 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
         $scope.useCategoryColors = CONFIG.USE_CATEGORY_COLORS;
 		$scope.showThemeOptions = CONFIG.USE_THEMES;
         $scope.outlookCategories = getCategories();
+		$scope.reportDelimiter = CONFIG.REPORT_DELIMITER;
         $scope.getState();
         $scope.initTasks();
 
@@ -530,7 +531,10 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
         var mailItem, mailBody;
         mailItem = outlookApp.CreateItem(0);
         mailItem.Subject = "Status Report";
-        mailItem.BodyFormat = 2;
+		if (CONFIG.REPORT_TO_FIELD.length > 0){
+			mailItem.to = CONFIG.REPORT_TO_FIELD;
+		}
+        //mailItem.BodyFormat = 2;
 
         mailBody = "<style>";
         mailBody += "body { font-family: Calibri; font-size:11.0pt; } ";
@@ -666,12 +670,17 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
         // }
 
         mailBody += "</body>"
-
-        // include report content to the mail body
-        mailItem.HTMLBody = mailBody;
-
-        // only display the draft email
-        mailItem.Display();
+		
+		if (CONFIG.USE_SIGNATURE_REPORT){
+			mailItem.Display();
+			// include report content to the mail body + signature
+			mailItem.HTMLBody = mailBody + mailItem.HTMLBody;
+		}
+        else{
+			//include report content to the mail body
+			mailItem.HTMLBody = mailBody;
+			mailItem.Display();
+		}
 
     };
 
@@ -679,8 +688,8 @@ tbApp.controller('taskboardController', function ($scope, CONFIG, $filter) {
     // shortens the string by number of chars
     // tries not to split words and adds ... at the end to give excerpt effect
     var taskExcerpt = function (str, limit) {
-        if (str.indexOf('\r\n### ') > 0) {
-            str = str.substring(0, str.indexOf('\r\n###'));
+        if (str.indexOf('\r\n' + $scope.reportDelimiter) > 0) {
+            str = str.substring(0, str.indexOf('\r\n' + $scope.reportDelimiter));
         }
         // remove empty lines
         str = str.replace(/^(?=\n)$|^\s*|\s*$|\n\n+/gm, '');
